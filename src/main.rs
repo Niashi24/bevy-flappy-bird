@@ -34,6 +34,7 @@ fn main() {
                 .set(ImagePlugin::default_nearest()),
         )
         .insert_resource(GlobalVolume::new(0.2))
+        .add_state::<GameState>()
         .add_plugins(PlayerPlugin)
         .add_systems(Startup, (spawn_camera, spawn_background))
         .run();
@@ -49,6 +50,7 @@ pub enum GameState {
 
 pub fn spawn_camera(mut commands: Commands) {
     let xy = lerp_window((0.5, 0.5).into());
+    println!("Camera spawned at {}", xy);
     commands.spawn(Camera2dBundle {
         projection: OrthographicProjection {
             scale: 1.0 / SCREEN_SCALE,
@@ -61,6 +63,7 @@ pub fn spawn_camera(mut commands: Commands) {
 
 fn spawn_background(mut commands: Commands, asset_server: Res<AssetServer>) {
     let xy = lerp_window((0.5, 0.5).into());
+    println!("Background spawned at {}", xy);
 
     commands.spawn(SpriteBundle {
         transform: Transform::from_xyz(xy.x, xy.y, -1.0),
@@ -91,8 +94,8 @@ impl Plugin for PlayerPlugin {
 }
 
 fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>) {
-    let xy = lerp_window((1.0 / 3.0, 0.5).into());
-    println!("Spawned Player");
+    let xy = lerp_window((1.0 / 2.0, 0.5).into());
+    println!("Player spawned at {}", xy);
 
     commands.spawn((
         SpriteBundle {
@@ -167,7 +170,7 @@ pub fn constrain_player_system(mut query: Query<(&mut Player, &mut Transform)>) 
 pub fn debug_on_press(query: Query<(&Transform, &Player)>, keyboard_input: Res<Input<KeyCode>>) {
     if let Ok((transform, player)) = query.get_single() {
         if keyboard_input.just_pressed(KeyCode::Space) {
-            println!("XYZ: {}, Y-Vel: {}", transform.translation, player.y_vel);
+            println!("Player XYZ: {}, Y-Vel: {}", transform.translation, player.y_vel);
         }
     }
 }
